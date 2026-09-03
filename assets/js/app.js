@@ -13,17 +13,20 @@
   updateProgress();
 
   const menuButton = $('.menu-toggle');
+  const menuButtonLabel = $('.menu-toggle .sr-only');
   const nav = $('#primary-nav');
   const closeMenu = () => {
     if (!menuButton || !nav) return;
     nav.classList.remove('open');
     menuButton.setAttribute('aria-expanded', 'false');
+    if (menuButtonLabel) menuButtonLabel.textContent = 'Open menu';
     document.body.classList.remove('menu-open');
   };
   menuButton?.addEventListener('click', () => {
     const open = !nav.classList.contains('open');
     nav.classList.toggle('open', open);
     menuButton.setAttribute('aria-expanded', String(open));
+    if (menuButtonLabel) menuButtonLabel.textContent = open ? 'Close menu' : 'Open menu';
     document.body.classList.toggle('menu-open', open);
   });
   $$('#primary-nav a').forEach(link => link.addEventListener('click', closeMenu));

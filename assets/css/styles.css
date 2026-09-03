@@ -35,11 +35,27 @@ h3{line-height:1.2}
 .nav-wrap{height:74px;display:flex;align-items:center;justify-content:space-between}
 .brand{display:flex;align-items:center;min-width:max-content}.brand-logo{display:block;width:auto;height:42px;object-fit:contain}
 .menu-toggle{width:46px;height:46px;border:1px solid rgba(255,255,255,.2);border-radius:13px;background:transparent;display:grid;place-content:center;gap:5px}.menu-toggle span:not(.sr-only){display:block;width:20px;height:2px;background:#fff;transition:.25s}
+.menu-toggle[aria-expanded="true"] span:not(.sr-only):nth-child(1){transform:translateY(7px) rotate(45deg)}
+.menu-toggle[aria-expanded="true"] span:not(.sr-only):nth-child(2){opacity:0}
+.menu-toggle[aria-expanded="true"] span:not(.sr-only):nth-child(3){transform:translateY(-7px) rotate(-45deg)}
 .primary-nav{position:fixed;top:74px;right:0;bottom:0;width:min(88vw,370px);padding:24px;background:var(--navy);display:flex;flex-direction:column;gap:4px;transform:translateX(105%);transition:transform .3s ease;box-shadow:-20px 30px 60px rgba(0,0,0,.22)}
 .primary-nav.open{transform:none}.primary-nav a{padding:14px 10px;border-bottom:1px solid rgba(255,255,255,.08);font-weight:700}.primary-nav .button{margin-top:16px;text-align:center;border-bottom:0}
 .button{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:13px 22px;border:1px solid var(--gold);border-radius:999px;background:var(--gold);color:var(--navy);font-weight:800;box-shadow:0 10px 30px rgba(198,167,78,.22);transition:transform .2s,background .2s,color .2s}
 .button:hover,.button:focus-visible{transform:translateY(-2px);background:var(--gold-2)}
-.button-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.36);box-shadow:none}.button-ghost:hover{background:#fff;color:var(--navy);border-color:#fff}
+.button-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.36);box-shadow:none}
+.button:active{transform:scale(.96)}
+@media(hover:hover){
+  .button:hover{transform:translateY(-2px);box-shadow:0 16px 36px rgba(198,167,78,.32)}
+  .button-ghost:hover{background:#fff;color:var(--navy);border-color:#fff}
+  .cluster-tab:hover{border-color:var(--gold);background:var(--ivory)}
+  .stake-tab:hover{border-color:var(--navy);color:var(--navy)}
+  .product-grid article:hover,.promise-grid article:hover{transform:translateY(-4px);box-shadow:0 20px 40px rgba(6,22,51,.1)}
+  .product-grid article.featured:hover{box-shadow:0 20px 40px rgba(6,22,51,.35)}
+  .ops-grid article:hover,.services article:hover{transform:translateY(-4px);border-color:rgba(198,167,78,.5);background:rgba(255,255,255,.07)}
+}
+.product-grid article,.promise-grid article{transition:transform .25s ease,box-shadow .25s ease}
+.ops-grid article,.services article{transition:transform .25s ease,border-color .25s ease,background .25s ease}
+.stake-tab{transition:border-color .2s,color .2s}
 .button-small{min-height:42px;padding:9px 18px}
 
 /* Hero */
@@ -54,8 +70,7 @@ h3{line-height:1.2}
 .carousel-viewport{position:relative;aspect-ratio:4/3;overflow:hidden}.carousel-slide{position:absolute;inset:0;margin:0;opacity:0;visibility:hidden;transition:opacity .7s ease,visibility .7s ease}.carousel-slide.active{opacity:1;visibility:visible;z-index:1}.carousel-slide img{width:100%;height:100%;object-fit:cover;transform:scale(1.04);transition:transform 7s ease}.carousel-slide.active img{transform:scale(1)}
 .carousel-slide figcaption{position:absolute;z-index:2;left:14px;right:14px;bottom:14px;padding:15px 16px;border-left:3px solid var(--gold);background:rgba(6,22,51,.88);color:#fff;backdrop-filter:blur(8px)}.carousel-slide figcaption small{display:block;color:var(--gold-2);font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.carousel-slide figcaption strong{display:block;font:700 1.08rem/1.25 Georgia,serif;margin-top:4px}
 .carousel-controls{position:absolute;z-index:5;right:13px;top:13px;display:flex;gap:6px}.carousel-controls button{width:40px;height:40px;border:1px solid rgba(255,255,255,.4);border-radius:50%;background:rgba(6,22,51,.8);color:#fff;font-weight:800;display:grid;place-items:center;backdrop-filter:blur(7px)}.carousel-controls button:hover,.carousel-controls button:focus-visible{background:var(--gold);border-color:var(--gold);color:var(--navy)}
-.carousel-dots{position:absolute;z-index:5;left:18px;top:18px;display:flex;gap:7px}.carousel-dots button{width:9px;height:9px;padding:0;border:1px solid rgba(255,255,255,.75);border-radius:50%;background:transparent}.carousel-dots button.active{width:28px;border-radius:999px;background:var(--gold);border-color:var(--gold)}
-.carousel-badge{position:absolute;z-index:4;left:14px;top:49px;background:rgba(255,255,255,.93);color:var(--navy);border-radius:12px;padding:9px 12px;display:grid;box-shadow:0 12px 30px rgba(0,0,0,.16)}.carousel-badge b{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em}.carousel-badge span{font-size:.68rem;color:var(--muted)}
+.carousel-dots{position:absolute;z-index:5;left:18px;top:18px;display:flex;gap:2px}.carousel-dots button{width:24px;height:24px;padding:0;border:0;background:transparent;display:grid;place-items:center}.carousel-dots button::after{content:"";display:block;width:9px;height:9px;border:1px solid rgba(255,255,255,.75);border-radius:50%;background:transparent;transition:.2s}.carousel-dots button.active::after{width:22px;border-radius:999px;background:var(--gold);border-color:var(--gold)}
 .school-stories{background:var(--navy);color:#fff;overflow:hidden}.school-stories::before{content:"";position:absolute;width:360px;height:360px;border:1px solid rgba(198,167,78,.18);border-radius:50%;left:-190px;top:40px}.school-stories-grid{position:relative;z-index:1}.story-carousel .carousel-viewport{aspect-ratio:4/3}
 .principles{margin-top:24px;border-top:1px solid rgba(255,255,255,.1);overflow:hidden}.ticker{display:flex;width:max-content;animation:ticker 25s linear infinite;padding:17px 0}.ticker span{color:rgba(255,255,255,.58);font-size:.77rem;text-transform:uppercase;letter-spacing:.12em;margin-right:54px}.ticker span::before{content:"◆";color:var(--gold);margin-right:14px}@keyframes ticker{to{transform:translateX(-50%)}}
 
