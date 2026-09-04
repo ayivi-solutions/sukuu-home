@@ -114,12 +114,27 @@
   });
 
   const journeySteps = $$('.journey-track li');
+  const journeyNote = $('#journey-note');
+  const journeyCopy = [
+    'Prospective families make contact and the school captures their interest as a governed institutional record from the first touchpoint.',
+    'Applications, assessment and offers move through an authorised admission workflow before a learner is enrolled.',
+    'Attendance, teaching, wellbeing, fees and family communication stay connected throughout every term.',
+    'Academic performance, conduct and development inform each learner\u2019s advancement, with an accountable history behind every decision.',
+    'Transcripts, records and institutional history transfer intact as the learner\u2019s journey with the school concludes.'
+  ];
   if (journeySteps.length && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     let journeyIndex = 0;
     window.setInterval(() => {
       journeySteps[journeyIndex].classList.remove('active');
       journeyIndex = (journeyIndex + 1) % journeySteps.length;
       journeySteps[journeyIndex].classList.add('active');
+      if (journeyNote && journeyCopy[journeyIndex]) {
+        journeyNote.style.opacity = '0';
+        window.setTimeout(() => {
+          journeyNote.textContent = journeyCopy[journeyIndex];
+          journeyNote.style.opacity = '1';
+        }, 300);
+      }
     }, 2400);
   }
 
@@ -132,16 +147,53 @@
     engagement: ['06', 'Engagement & insight', 'Turn authorised information into timely action.', 'Coordinate approvals, communication, notifications and leadership indicators so the right person can respond while action is still useful.']
   };
   const clusterPanel = $('#cluster-panel');
-  $$('.cluster-tab').forEach(button => button.addEventListener('click', () => {
+  const clusterTabs = $$('.cluster-tab');
+  const activateCluster = button => {
     const [number, label, title, copy] = clusterCopy[button.dataset.cluster];
-    $$('.cluster-tab').forEach(tab => { tab.classList.remove('active'); tab.setAttribute('aria-selected', 'false'); });
+    clusterTabs.forEach(tab => { tab.classList.remove('active'); tab.setAttribute('aria-selected', 'false'); });
     button.classList.add('active');
     button.setAttribute('aria-selected', 'true');
     clusterPanel.innerHTML = `<span class="panel-number">${number}</span><p class="eyebrow">${label}</p><h3>${title}</h3><p>${copy}</p>`;
     clusterPanel.classList.remove('refresh');
     void clusterPanel.offsetWidth;
     clusterPanel.classList.add('refresh');
+  };
+  clusterTabs.forEach(button => button.addEventListener('click', () => {
+    stopClusterAutoplay();
+    activateCluster(button);
   }));
+
+  let clusterAutoplayTimer = null;
+  let clusterAutoplayStopped = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const stopClusterAutoplay = () => {
+    clusterAutoplayStopped = true;
+    if (clusterAutoplayTimer) window.clearInterval(clusterAutoplayTimer);
+    clusterAutoplayTimer = null;
+  };
+  const startClusterAutoplay = () => {
+    if (clusterAutoplayStopped || clusterAutoplayTimer || !clusterTabs.length) return;
+    clusterAutoplayTimer = window.setInterval(() => {
+      const activeIndex = clusterTabs.findIndex(tab => tab.classList.contains('active'));
+      const nextIndex = (activeIndex + 1) % clusterTabs.length;
+      activateCluster(clusterTabs[nextIndex]);
+    }, 4200);
+  };
+  const pauseClusterAutoplay = () => { if (clusterAutoplayTimer) { window.clearInterval(clusterAutoplayTimer); clusterAutoplayTimer = null; } };
+  const clusterLayout = $('.cluster-layout');
+  if (clusterLayout && !clusterAutoplayStopped) {
+    clusterLayout.addEventListener('mouseenter', pauseClusterAutoplay);
+    clusterLayout.addEventListener('mouseleave', startClusterAutoplay);
+    clusterLayout.addEventListener('focusin', pauseClusterAutoplay);
+    clusterLayout.addEventListener('focusout', startClusterAutoplay);
+    if ('IntersectionObserver' in window) {
+      const clusterObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => { if (entry.isIntersecting) startClusterAutoplay(); else pauseClusterAutoplay(); });
+      }, { threshold: 0.4 });
+      clusterObserver.observe(clusterLayout);
+    } else {
+      startClusterAutoplay();
+    }
+  }
 
   const stakeholderCopy = {
     leaders: {
@@ -187,4 +239,51 @@
   window.addEventListener('scroll', () => backToTop?.classList.toggle('show', window.scrollY > 700), { passive: true });
   backToTop?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   $('#year').textContent = String(new Date().getFullYear());
+
+  const shareToggle = $('.share-toggle');
+  const shareMenu = $('#share-menu');
+  const shareData = () => ({
+    url: window.location.href,
+    title: document.title,
+    text: document.querySelector('meta[name="description"]')?.content || document.title
+  });
+  const closeShareMenu = () => {
+    if (!shareToggle || !shareMenu) return;
+    shareMenu.hidden = true;
+    shareToggle.setAttribute('aria-expanded', 'false');
+  };
+  if (shareToggle && shareMenu) {
+    if (navigator.share) {
+      shareToggle.addEventListener('click', () => { navigator.share(shareData()).catch(() => {}); });
+    } else {
+      shareToggle.addEventListener('click', () => {
+        const open = shareMenu.hidden;
+        shareMenu.hidden = !open;
+        shareToggle.setAttribute('aria-expanded', String(open));
+      });
+      document.addEventListener('click', event => {
+        if (!shareMenu.hidden && !shareMenu.contains(event.target) && event.target !== shareToggle) closeShareMenu();
+      });
+      document.addEventListener('keydown', event => { if (event.key === 'Escape') closeShareMenu(); });
+      const { url, title, text } = shareData();
+      const links = {
+        whatsapp: `https://wa.me/?text=${encodeURIComponent(`${title} ${url}`)}`,
+        facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+        x: `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`,
+        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+        email: `mailto:?subject=${encodeURIComponent(title)}&body=${encodeURIComponent(`${text}\n\n${url}`)}`
+      };
+      Object.entries(links).forEach(([key, href]) => {
+        const el = shareMenu.querySelector(`[data-share="${key}"]`);
+        if (el) { el.href = href; el.target = '_blank'; el.rel = 'noopener'; el.addEventListener('click', closeShareMenu); }
+      });
+      const copyButton = shareMenu.querySelector('[data-share="copy"]');
+      copyButton?.addEventListener('click', () => {
+        navigator.clipboard?.writeText(url).then(() => {
+          const label = copyButton.querySelector('span');
+          if (label) { const original = label.textContent; label.textContent = 'Copied!'; window.setTimeout(() => { label.textContent = original; }, 1800); }
+        }).catch(() => {});
+      });
+    }
+  }
 })();
